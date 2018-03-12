@@ -1,0 +1,14 @@
+package com.shoprunner.baleenproductdemo.controller
+
+import com.shoprunner.baleenproductdemo.csv.FlowableUtil
+import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.server.ServerResponse
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.core.publisher.toFlux
+import org.springframework.http.MediaType.APPLICATION_JSON
+
+@Component
+class FeedHandler {
+    fun getProducts() = FlowableUtil.fromCsvWithHeader("/Users/mmaletich/git/baleen-product-demo/flipkart_com-ecommerce_sample.csv")
+}
