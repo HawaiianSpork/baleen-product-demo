@@ -24,8 +24,8 @@ object FlowableUtil {
         }
     }
 
-    fun fromCsvWithHeader(fileName: String, delimiter: Char = ','): Flowable<Context> {
-        val readerFactory = { CSVReader(FileReader(fileName), delimiter) }
+    fun fromCsvWithHeader(fileName: String, delimiter: Char = ',', quote: Char = '"', escape: Char = '\\'): Flowable<Context> {
+        val readerFactory = { CSVReader(FileReader(fileName), delimiter, quote, escape) }
 
         val rows = Flowable.using(readerFactory, { Flowable.fromIterable(it) }, { it.close() })
         val head = rows.take(1).cache()

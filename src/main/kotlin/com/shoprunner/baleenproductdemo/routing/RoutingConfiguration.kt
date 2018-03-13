@@ -1,7 +1,9 @@
 package com.shoprunner.baleenproductdemo.routing
 
 import com.shoprunner.baleenproductdemo.controller.FeedHandler
+import com.shoprunner.baleenproductdemo.spec.Spec
 import io.reactivex.Flowable
+import io.reactivex.rxkotlin.toFlowable
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
@@ -29,6 +31,13 @@ class RoutingConfiguration {
 
             GET("/") { req ->
                 ok().body(handler.getProducts().`as`{ paginate(req, it) })
+            }
+
+            GET("/validations") { req ->
+                ok().body(
+                        handler.getProducts().`as`{ paginate(req, it) }
+                        .flatMap { ctx -> Spec.productSpec.validate(ctx).results.iterator().toFlowable() }
+                )
             }
         }
 

@@ -46,8 +46,9 @@ task webpack(type: Exec) {
 
 
 dependencies {
-    compile('com.shoprunner:com.shoprunner.baleen:0.8.0')
+    compile('com.shoprunner:baleen:0.10.0')
     compile("org.springframework.boot:spring-boot-starter-webflux")
+	compile("org.springframework.boot:spring-boot-devtools")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	compile("org.jetbrains.kotlin:kotlin-reflect")
     compile('com.opencsv:opencsv:3.7')
