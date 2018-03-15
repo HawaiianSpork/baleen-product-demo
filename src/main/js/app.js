@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const React = require('react');
 const ReactDOM = require('react-dom');
 const client = require('./client');
@@ -9,13 +10,13 @@ class App extends React.Component {
         this.state = {
             productCtxs: [],
             validations: [],
-            nav: 'products'
+            nav: 'validation'
         };
 
         this.navClick = this.navClick.bind(this)
     }
 
-    componentDidMount() {
+    getValidations() {
         client({method: 'GET', path: '/api/products'}).done(response => {
             this.setState({productCtxs: response.entity})
         });
@@ -24,6 +25,10 @@ class App extends React.Component {
             let valids = response.entity.filter((validationResult) => validationResult.type !== undefined);
             this.setState({validations: valids})
         })
+    }
+
+    componentDidMount() {
+        this.interval = setInterval(this.getValidations.bind(this), 1000);
     }
 
     navClick(nav) {
@@ -54,11 +59,14 @@ class Nav extends React.Component {
                 <div className="collapse navbar-collapse">
                     <ul className="navbar-nav">
                         <li className="nav-item active">
-                            <a className="nav-link" onClick={this.props.onClick("products")}>Products</a>
+                            Baleen
                         </li>
-                        <li className="nav-item">
-                            <a className="nav-link" onClick={this.props.onClick("validation")}>Validation</a>
-                        </li>
+                        {/*<li className="nav-item active">*/}
+                            {/*<a className="nav-link" onClick={this.props.onClick("products")}>Products</a>*/}
+                        {/*</li>*/}
+                        {/*<li className="nav-item">*/}
+                            {/*<a className="nav-link" onClick={this.props.onClick("validation")}>Validation</a>*/}
+                        {/*</li>*/}
                     </ul>
                 </div>
             </nav>
@@ -67,17 +75,24 @@ class Nav extends React.Component {
 }
 
 class ValidationMessages extends React.Component {
+    summarize(validations) {
+        return _.groupBy(validations,(validation) => validation.message)
+    }
+
     render() {
-        const messages = this.props.validations.filter((x) => x.type === 'Error').map(validation => {
-                const dataTrace = validation.context.dataTrace.join(", ");
-                return (<li>{dataTrace} {validation.message}</li>)
+        const messages = Object.entries(this.summarize(this.props.validations
+            .filter((x) => x.type === 'Error')))
+            .map(validations => {
+                return (<div className="alert alert-danger">{validations[0]} ({validations[1].length} times)</div>)
+                // const dataTrace = validation.context.dataTrace.join(", ");
+                // return (<div className="alert alert-danger">{dataTrace} {validation.message}</div>)
             }
         );
 
         return (
-            <ul>
-                {messages}
-            </ul>
+            <div className="container">
+            {messages}
+            </div>
         )
     }
 }
@@ -142,9 +157,9 @@ class Product extends React.Component{
                       </div>
                     </div>
                     <div className="card-body">
-                        <div className="dataTrace">{this.props.productCtx.data.product_name}</div>
+                        <div>{this.props.productCtx.data.product_name}</div>
                         <div>${price}</div>
-                        <div>{dataTrace}</div>
+                        <div className="dataTrace">{dataTrace}</div>
                     </div>
                 </div>
             </div>
