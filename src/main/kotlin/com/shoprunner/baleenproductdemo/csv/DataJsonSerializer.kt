@@ -15,8 +15,6 @@ class DataJsonSerializer : StdSerializer<Data>(Data::class.java) {
             gen?.writeObjectField(key, value[key])
         }
         gen?.writeEndObject()
-
-
     }
 
 }

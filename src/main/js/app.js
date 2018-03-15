@@ -18,10 +18,10 @@ class App extends React.Component {
     componentDidMount() {
         client({method: 'GET', path: '/api/products'}).done(response => {
             this.setState({productCtxs: response.entity})
-        })
+        });
 
         client({method: 'GET', path: '/api/products/validations'}).done(response => {
-            let valids = response.entity.filter((validationResult) => validationResult.type != undefined)
+            let valids = response.entity.filter((validationResult) => validationResult.type !== undefined);
             this.setState({validations: valids})
         })
     }
@@ -35,9 +35,13 @@ class App extends React.Component {
             <div>
                 <Nav onClick={this.navClick}/>
                 {this.state.nav === 'products' &&
-                    < ProductList productCtxs={this.state.productCtxs}/>}
+                    <ProductList productCtxs={this.state.productCtxs}/>}
                 {this.state.nav === 'validation' &&
-                    <ValidationList productCtxs={this.state.validations}/>}
+                    <div>
+                        <ValidationMessages validations={this.state.validations}/>
+                        <ValidationList productCtxs={this.state.validations}/>
+                    </div>
+                }
             </div>
         )
     }
@@ -58,6 +62,22 @@ class Nav extends React.Component {
                     </ul>
                 </div>
             </nav>
+        )
+    }
+}
+
+class ValidationMessages extends React.Component {
+    render() {
+        const messages = this.props.validations.filter((x) => x.type === 'Error').map(validation => {
+                const dataTrace = validation.context.dataTrace.join(", ");
+                return (<li>{dataTrace} {validation.message}</li>)
+            }
+        );
+
+        return (
+            <ul>
+                {messages}
+            </ul>
         )
     }
 }
@@ -83,7 +103,7 @@ class ValidationList extends React.Component{
             <Product key={productCtx.context.data.unique_id} productCtx={productCtx.context}/>
         );
         const validProducts = toProducts(this.props.productCtxs.filter((x) => x.type === 'Success'));
-        const invalidProducts = toProducts(this.props.productCtxs.filter((x) => x.type === 'Error'))
+        const invalidProducts = toProducts(this.props.productCtxs.filter((x) => x.type === 'Error'));
         return (
             <div className="container">
                 <div className="row">
@@ -111,13 +131,20 @@ class Product extends React.Component{
         } catch(err) {
             imageUrl = "";
         }
+        const dataTrace = this.props.productCtx.dataTrace.join(", ");
+        const price = this.props.productCtx.data.retail_price;
         return (
             <div className="col-md-3">
                 <div className="card mb-4 box-shadow">
-                    <img className="card-img-top" src={imageUrl}/>
+                    <div className="card-img-top">
+                      <div className="reframe">
+                        <img src={imageUrl} />
+                      </div>
+                    </div>
                     <div className="card-body">
-                        {this.props.productCtx.data.product_name}
-                        {this.props.productCtx.data.retail_price}
+                        <div className="dataTrace">{this.props.productCtx.data.product_name}</div>
+                        <div>${price}</div>
+                        <div>{dataTrace}</div>
                     </div>
                 </div>
             </div>
@@ -128,4 +155,4 @@ class Product extends React.Component{
 ReactDOM.render(
     <App />,
     document.getElementById('react')
-)
+);

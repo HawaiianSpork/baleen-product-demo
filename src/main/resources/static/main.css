@@ -1,0 +1,16 @@
+.reframe {
+    height: 250px;
+    overflow: hidden;
+}
+
+.reframe img {
+    height: auto;
+    width: 170px;
+    display: block;
+    margin: auto;
+}
+
+.dataTrace {
+    font-size: small;
+    color: darkgray;
+}

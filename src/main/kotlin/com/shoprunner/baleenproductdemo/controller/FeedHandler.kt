@@ -13,5 +13,13 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 @Component
 class FeedHandler {
     fun getProducts() = FlowableUtil.fromCsvWithHeader("/Users/mmaletich/git/baleen-product-demo/flipkart_com-ecommerce_sample.csv", escape='\u0000')
+            .filter{
+                val foo = it.data["product_category_tree"]
+                when(foo) {
+                    is String -> foo.contains(">> Bags >>")
+                    else -> false
+                }
+            }
+
 
 }
