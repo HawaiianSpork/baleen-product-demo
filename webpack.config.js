@@ -1,4 +1,5 @@
-var path = require('path');
+const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: './src/main/js/app.js',
@@ -9,6 +10,14 @@ module.exports = {
         path: __dirname,
         filename: './src/main/resources/static/built/bundle.js'
     },
+    plugins: [
+      new CopyWebpackPlugin([
+        {
+          from: 'node_modules/monaco-editor/min/vs',
+          to: 'src/main/resources/static/vs/',
+        }
+      ])
+    ],
     module: {
         loaders: [
             {

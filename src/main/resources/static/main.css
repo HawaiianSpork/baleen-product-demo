@@ -14,3 +14,9 @@
     font-size: small;
     color: darkgray;
 }
+
+.editor {
+  position: relative;
+  border: 1px solid #b9b9b9;
+  margin-top: 30px;
+}
