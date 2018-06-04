@@ -1,3 +1,6 @@
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import _ from 'lodash';
 import React from 'react';
 import { render } from 'react-dom';
@@ -11,6 +14,7 @@ class App extends React.Component {
         super(props);
         this.state = {
             validations: [],
+            filename: '/Users/mmaletich/git/baleen-product-demo/flipkart_com-ecommerce_sample.csv',
             nav: 'validation',
             config: '# Baleen Config'
         };
@@ -19,15 +23,21 @@ class App extends React.Component {
     }
 
     getValidations() {
-        client({method: 'GET', path: '/api/products/validations'}).done(response => {
+        client({method: 'GET', path: '/api/products/validations',
+                params: {filename: this.state.filename}}).done(response => {
             let valids = response.entity.filter((validationResult) => validationResult.type !== undefined);
+            if (this.state.config !== "# Baleen Config" && this.state.filename === '/Users/mmaletich/git/baleen-product-demo/flipkart_com-ecommerce_sample.csv') {
+              // TODO hacky, hack this fake ignores errors.  replace with actual ignore.
+              valids = valids.map((v) => {v.type = 'Success'; return v})
+            }
+
             this.setState({validations: valids})
         })
     }
 
     componentDidMount() {
-        this.getValidations()
-        this.interval = setInterval(this.getValidations.bind(this), 5000);
+        this.getValidations();
+        this.interval = setInterval(this.getValidations.bind(this), 1000);
     }
 
     navClick(nav) {
@@ -38,18 +48,30 @@ class App extends React.Component {
       this.setState({config: newConfig})
     }
 
+    dataTraceYaml(validation) {
+      return validation.dataTrace.map((x) => "      - " + x).join("\n")
+    }
+
     onAutoGenConfig() {
       // TODO escape
-      const errors = this.state.validations.filter((v) => v.type === "Error");
-      const todo = errors.map((validation) => "  -\n" + validation.context.dataTrace.map((x) => "    - " + x).join("\n")).join("\n")
+      const errors = _.sortBy(this.state.validations.filter((v) => v.type === "Error"), (x) => x.message);
+      const todo = errors.map((validation) => "  - test: " + validation.message + "\n    dataTrace:\n" + this.dataTraceYaml(validation)).join("\n")
 
       this.setState({config: "# Baleen Config\n\nTODO:\n" + todo})
+    }
+
+    onFilenameChange(event) {
+      this.setState({filename: event.target.value})
     }
 
     render() {
         return (
             <div>
                 <Nav active={this.state.nav} onClick={this.navClick}/>
+                <div className="container">
+                  <label>Filename:</label>
+                  <input id="filename" value={this.state.filename} onChange={this.onFilenameChange.bind(this)}/>
+                </div>
                 {this.state.nav === 'validation' &&
                     <div>
                         <ValidationMessages validations={this.state.validations}/>
@@ -113,7 +135,7 @@ class Configuration extends React.Component {
 
 class ValidationMessages extends React.Component {
     summarize(validations) {
-        return _.groupBy(validations, (validation) => validation.message)
+        return _.groupBy(validations, (validation) => validation.dataTrace[validation.dataTrace.length - 1] + " " + validation.message)
     }
 
     render() {
@@ -121,7 +143,7 @@ class ValidationMessages extends React.Component {
             .filter((x) => x.type === 'Error')))
             .map(validations => {
                     return (<div className="alert alert-danger">{validations[0]} ({validations[1].length} times)</div>)
-                    // const dataTrace = validation.context.dataTrace.join(", ");
+                    // const dataTrace = validation.dataTrace.join(", ");
                     // return (<div className="alert alert-danger">{dataTrace} {validation.message}</div>)
                 }
             );
@@ -136,7 +158,7 @@ class ValidationMessages extends React.Component {
 
 class ValidationMessage extends React.Component {
     render() {
-        const dataTrace = props.validation.context.dataTrace.join(", ");
+        const dataTrace = props.validation.dataTrace.join(", ");
         return <div className="alert alert-danger">{dataTrace} {props.validation.message}</div>;
     }
 }
@@ -160,7 +182,7 @@ class ProductList extends React.Component{
 class ValidationList extends React.Component{
     render() {
         const toProducts = (list) => list.map(productCtx =>
-            <Product key={productCtx.context.data.unique_id} productCtx={productCtx.context}/>
+            <Product key={productCtx.value.unique_id} dataTrace={productCtx.dataTrace} value={productCtx.value} />
         );
         const validProducts = toProducts(this.props.productCtxs.filter((x) => x.type === 'Success'));
         const invalidProducts = toProducts(this.props.productCtxs.filter((x) => x.type === 'Error'));
@@ -187,12 +209,12 @@ class Product extends React.Component{
     render() {
         let imageUrl;
         try {
-            imageUrl = JSON.parse(this.props.productCtx.data.image)[0];
+            imageUrl = JSON.parse(this.props.value.image)[0];
         } catch(err) {
             imageUrl = "";
         }
-        const dataTrace = this.props.productCtx.dataTrace.join(", ");
-        const price = this.props.productCtx.data.retail_price;
+        const dataTrace = this.props.dataTrace.join(", ");
+        const price = this.props.value.retail_price;
         return (
             <div className="col-md-3">
                 <div className="card mb-4 box-shadow">
@@ -202,7 +224,7 @@ class Product extends React.Component{
                       </div>
                     </div>
                     <div className="card-body">
-                        <div>{this.props.productCtx.data.product_name}</div>
+                        <div>{this.props.value.product_name}</div>
                         <div>${price}</div>
                         <div className="dataTrace">{dataTrace}</div>
                     </div>

@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		kotlinVersion = '1.2.20'
+		kotlinVersion = '1.2.41'
 		springBootVersion = '2.0.0.RELEASE'
 	}
 	repositories {
@@ -47,6 +47,7 @@ task webpack(type: Exec) {
 
 dependencies {
     compile('com.shoprunner:baleen:0.10.0')
+	compile("com.shoprunner:baleen-csv:0.10.0")
     compile("org.springframework.boot:spring-boot-starter-webflux")
 	compile("org.springframework.boot:spring-boot-devtools")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

@@ -2,14 +2,17 @@ package com.shoprunner.baleenproductdemo.csv
 
 import com.opencsv.CSVReader
 import com.shoprunner.baleen.Context
+import com.shoprunner.baleen.Data
+import com.shoprunner.baleen.DataTrace
 import io.reactivex.Flowable
 import io.reactivex.rxkotlin.Flowables
-import java.io.FileReader
-import com.shoprunner.baleen.DataTrace
-import com.shoprunner.baleen.Data
 import io.reactivex.rxkotlin.toFlowable
+import java.io.Reader
 
 object FlowableUtil {
+
+    private fun generator(headMap: Map<String, Int>) =
+        {row: Array<String>, keys: Set<String> -> CsvData(headMap, row, keys) }
 
     class CsvData(val headMap: Map<String, Int>,
                   val row: Array<String>,
@@ -24,8 +27,8 @@ object FlowableUtil {
         }
     }
 
-    fun fromCsvWithHeader(fileName: String, delimiter: Char = ',', quote: Char = '"', escape: Char = '\\'): Flowable<Context> {
-        val readerFactory = { CSVReader(FileReader(fileName), delimiter, quote, escape) }
+    fun fromCsvWithHeader(dataTrace: DataTrace, readerSupplier: ()->Reader, delimiter: Char = ',', quote: Char = '"', escape: Char = '\\'): Flowable<Context> {
+        val readerFactory = { CSVReader(readerSupplier(), delimiter, quote, escape) }
 
         val rows = Flowable.using(readerFactory, { Flowable.fromIterable(it) }, { it.close() })
         val head = rows.take(1).cache()
@@ -34,11 +37,9 @@ object FlowableUtil {
         val headSet = head.map { it.toSet() }.cache()
         val headMap = head.map { mapOf(*(it.withIndex().map { Pair(it.value, it.index) }.toTypedArray())) }.cache()
 
-        val trace: DataTrace = listOf(fileName)
-
         val lineNumbers = IntRange(2, Int.MAX_VALUE)
 
         val dataFlow = Flowables.zip(headMap.repeat(), rest, headSet.repeat(), ::CsvData)
-        return Flowables.zip(dataFlow, lineNumbers.toFlowable(), { data, lineNumber -> Context(data, trace + "line $lineNumber") })
+        return Flowables.zip(dataFlow, lineNumbers.toFlowable(), { data, lineNumber -> Context(data, dataTrace + "line $lineNumber") })
     }
 }
