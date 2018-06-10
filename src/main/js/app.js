@@ -14,7 +14,7 @@ class App extends React.Component {
         super(props);
         this.state = {
             validations: [],
-            filename: '/Users/mmaletich/git/baleen-product-demo/flipkart_com-ecommerce_sample.csv',
+            filename: '/Users/mmaletich/git/baleen-product-demo/presentation_samples/purses.csv',
             nav: 'validation',
             config: '# Baleen Config'
         };
@@ -26,7 +26,7 @@ class App extends React.Component {
         client({method: 'GET', path: '/api/products/validations',
                 params: {filename: this.state.filename}}).done(response => {
             let valids = response.entity.filter((validationResult) => validationResult.type !== undefined);
-            if (this.state.config !== "# Baleen Config" && this.state.filename === '/Users/mmaletich/git/baleen-product-demo/flipkart_com-ecommerce_sample.csv') {
+            if (this.state.config !== "# Baleen Config" && this.state.filename === '/Users/mmaletich/git/baleen-product-demo/presentation_samples/purses.cs') {
               // TODO hacky, hack this fake ignores errors.  replace with actual ignore.
               valids = valids.map((v) => {v.type = 'Success'; return v})
             }

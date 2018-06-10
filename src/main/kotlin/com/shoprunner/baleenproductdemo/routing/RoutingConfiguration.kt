@@ -29,10 +29,6 @@ class RoutingConfiguration {
     fun routerFunction(handler: FeedHandler): RouterFunction<ServerResponse> = router {
         ("/api/products").nest {
 
-//            GET("/") { req ->
-//                ok().body(handler.getProducts().`as`{ paginate(req, it) })
-//            }
-
             GET("/validations") { req ->
                 //TODO
                 val filename = req.queryParam("filename").get()
