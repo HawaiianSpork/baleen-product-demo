@@ -1,9 +1,7 @@
 package com.shoprunner.baleenproductdemo
 
 import com.shoprunner.baleen.DataTrace
-import com.shoprunner.baleen.Validation
 import com.shoprunner.baleen.ValidationError
-import com.shoprunner.baleen.ValidationResult
 import com.shoprunner.baleen.ValidationSuccess
 import com.shoprunner.baleen.dataTrace
 
@@ -41,13 +39,13 @@ fun testStringGreaterThan4(dt: DataTrace, value: String) =
 println(testStringGreaterThan4(dataTrace, "5"))
 
 
-fun stringCoercibleToInt(fn: (DataTrace, Int) -> ValidationResult) =
-    fun(dt: DataTrace, value: String): ValidationResult {
-        when {
-            value.toIntOrNull() != null -> fn(dt, value.toInt())
-            else -> ValidationError(dt, "Was not an integer", value)
-        }
-    }
+//fun stringCoercibleToInt(fn: (DataTrace, Int) -> ValidationResult) =
+//    fun(dt: DataTrace, value: String): ValidationResult {
+//        when {
+//            value.toIntOrNull() != null -> fn(dt, value.toInt())
+//            else -> ValidationError(dt, "Was not an integer", value)
+//        }
+//    }
 
 
 //val testStringGreaterThan4 = stringCoercibleToInt(:testGreaterThan4)

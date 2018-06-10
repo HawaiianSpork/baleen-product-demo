@@ -182,7 +182,7 @@ class ProductList extends React.Component{
 class ValidationList extends React.Component{
     render() {
         const toProducts = (list) => list.map(productCtx =>
-            <Product key={productCtx.value.unique_id} dataTrace={productCtx.dataTrace} value={productCtx.value} />
+            <Product key={productCtx.data.unique_id} dataTrace={productCtx.dataTrace} data={productCtx.data} />
         );
         const validProducts = toProducts(this.props.productCtxs.filter((x) => x.type === 'Success'));
         const invalidProducts = toProducts(this.props.productCtxs.filter((x) => x.type === 'Error'));
@@ -209,12 +209,12 @@ class Product extends React.Component{
     render() {
         let imageUrl;
         try {
-            imageUrl = JSON.parse(this.props.value.image)[0];
+            imageUrl = JSON.parse(this.props.data.image)[0];
         } catch(err) {
             imageUrl = "";
         }
         const dataTrace = this.props.dataTrace.join(", ");
-        const price = this.props.value.retail_price;
+        const price = this.props.data.retail_price;
         return (
             <div className="col-md-3">
                 <div className="card mb-4 box-shadow">
@@ -224,7 +224,7 @@ class Product extends React.Component{
                       </div>
                     </div>
                     <div className="card-body">
-                        <div>{this.props.value.product_name}</div>
+                        <div>{this.props.data.product_name}</div>
                         <div>${price}</div>
                         <div className="dataTrace">{dataTrace}</div>
                     </div>

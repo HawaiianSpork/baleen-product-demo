@@ -1,6 +1,7 @@
 package com.shoprunner.baleenproductdemo.routing
 
 import com.shoprunner.baleenproductdemo.controller.FeedHandler
+import com.shoprunner.baleenproductdemo.csv.DataWithValidation
 import com.shoprunner.baleenproductdemo.types.Types
 import io.reactivex.Flowable
 import io.reactivex.rxkotlin.toFlowable
@@ -16,7 +17,6 @@ import org.springframework.web.reactive.function.server.router
 
 @Configuration
 class RoutingConfiguration {
-
 
     fun <T>paginate(req: ServerRequest, list: Flowable<T>): Flowable<T> {
         val pageOption = req.queryParam("page")
@@ -35,7 +35,7 @@ class RoutingConfiguration {
 
                 ok().body(
                         handler.getProducts(filename).`as`{ paginate(req, it) }
-                        .flatMap { ctx -> Types.productType.validate(ctx).results.iterator().toFlowable() }
+                        .flatMap { ctx -> Types.productType.validate(ctx).results.map { DataWithValidation(ctx.data, it) }.toFlowable() }
                 )
             }
         }
