@@ -7,10 +7,6 @@ import com.shoprunner.baleen.types.StringCoercibleToLong
 object Types {
 
     val productType = Baleen.describe("Product") {
-        it.attr(
-            name = "retail_price",
-            type = StringCoercibleToLong(LongType(min=0)),
-            required = true
-        )
+        
     }
 }

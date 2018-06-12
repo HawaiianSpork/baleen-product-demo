@@ -1,8 +1,9 @@
 package com.shoprunner.baleenproductdemo.routing
 
+import com.shoprunner.baleen.Context
 import com.shoprunner.baleenproductdemo.controller.FeedHandler
 import com.shoprunner.baleenproductdemo.csv.DataWithValidation
-import com.shoprunner.baleenproductdemo.types.Types
+import com.shoprunner.baleenproductdemo.types.Types.productType
 import io.reactivex.Flowable
 import io.reactivex.rxkotlin.toFlowable
 import org.springframework.context.annotation.Bean
@@ -25,18 +26,23 @@ class RoutingConfiguration {
         return list.skip(pageSize * (page - 1)).take(pageSize)
     }
 
+    fun validate(ctx: Context): List<DataWithValidation> {
+        val validationResults = productType.validate(ctx).results
+
+        return validationResults.map { DataWithValidation(ctx.data, it) }
+    }
+
     @Bean
     fun routerFunction(handler: FeedHandler): RouterFunction<ServerResponse> = router {
         ("/api/products").nest {
 
             GET("/validations") { req ->
-                //TODO
                 val filename = req.queryParam("filename").get()
+                val products = handler.getProducts(filename).`as`{ paginate(req, it) }
 
-                ok().body(
-                        handler.getProducts(filename).`as`{ paginate(req, it) }
-                        .flatMap { ctx -> Types.productType.validate(ctx).results.map { DataWithValidation(ctx.data, it) }.toFlowable() }
-                )
+                val validationResults = products.flatMap { validate(it).toFlowable() }
+
+                ok().body(validationResults)
             }
         }
 
