@@ -3,7 +3,7 @@ package com.shoprunner.baleenproductdemo.routing
 import com.shoprunner.baleen.Context
 import com.shoprunner.baleenproductdemo.controller.FeedHandler
 import com.shoprunner.baleenproductdemo.csv.DataWithValidation
-import com.shoprunner.baleenproductdemo.types.Types.productType
+import com.shoprunner.baleenproductdemo.types.productType
 import io.reactivex.Flowable
 import io.reactivex.rxkotlin.toFlowable
 import org.springframework.context.annotation.Bean

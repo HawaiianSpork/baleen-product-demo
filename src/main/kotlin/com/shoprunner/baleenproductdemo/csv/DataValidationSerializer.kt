@@ -11,10 +11,11 @@ import org.springframework.boot.jackson.JsonComponent
 @JsonComponent
 class DataValidationSerializer : StdSerializer<DataWithValidation>(DataWithValidation::class.java) {
 
-    // Work arround because Data Trace doesn't currently return array
-    fun dataTraceToArray(dataTrace: DataTrace) : List<String> {
-        val s = dataTrace.toString()
-        return s.substring(1, s.length - 1).split(",")
+    fun writeDataTrace(gen: JsonGenerator?, dataTrace: DataTrace) {
+        gen?.writeStartObject()
+        gen?.writeObjectField("stack", dataTrace.toList())
+        gen?.writeObjectField("tags", dataTrace.tags)
+        gen?.writeEndObject()
     }
 
     override fun serialize(pair: DataWithValidation?, gen: JsonGenerator?, provider: SerializerProvider?) {
@@ -24,13 +25,15 @@ class DataValidationSerializer : StdSerializer<DataWithValidation>(DataWithValid
         when (value) {
             is ValidationSuccess -> {
                 gen?.writeObjectField("type", "Success")
-                gen?.writeObjectField("dataTrace", dataTraceToArray(value.dataTrace))
+                gen?.writeFieldName("dataTrace")
+                writeDataTrace(gen, value.dataTrace)
                 gen?.writeObjectField("value", value.value)
                 gen?.writeObjectField("data", data)
             }
             is ValidationError -> {
                 gen?.writeObjectField("type", "Error")
-                gen?.writeObjectField("dataTrace", dataTraceToArray(value.dataTrace))
+                gen?.writeFieldName("dataTrace")
+                writeDataTrace(gen, value.dataTrace)
                 gen?.writeObjectField("value", value.value)
                 gen?.writeObjectField("message", value.message)
                 gen?.writeObjectField("data", data)

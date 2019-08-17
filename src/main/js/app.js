@@ -135,14 +135,14 @@ class Configuration extends React.Component {
 
 class ValidationMessages extends React.Component {
     summarize(validations) {
-        return _.groupBy(validations, (validation) => validation.dataTrace[validation.dataTrace.length - 1] + " " + validation.message)
+        return _.map(validations, (validation) => validation.dataTrace.stack[validation.dataTrace.stack.length - 1] + " " + validation.message)
     }
 
     render() {
-        const messages = Object.entries(this.summarize(this.props.validations
-            .filter((x) => x.type === 'Error')))
-            .map(validations => {
-                    return (<div className="alert alert-danger">{validations[0]} ({validations[1].length} times)</div>)
+        const messages = this.props.validations
+            .filter((x) => x.type === 'Error')
+            .map(validation => {
+                    return (<div className="alert alert-danger">{validation.message} (line {validation.dataTrace.tags.line})</div>)
                     // const dataTrace = validation.dataTrace.join(", ");
                     // return (<div className="alert alert-danger">{dataTrace} {validation.message}</div>)
                 }
@@ -158,7 +158,7 @@ class ValidationMessages extends React.Component {
 
 class ValidationMessage extends React.Component {
     render() {
-        const dataTrace = props.validation.dataTrace.join(", ");
+        const dataTrace = props.validation.dataTrace;
         return <div className="alert alert-danger">{dataTrace} {props.validation.message}</div>;
     }
 }
@@ -213,7 +213,7 @@ class Product extends React.Component{
         } catch(err) {
             imageUrl = "";
         }
-        const dataTrace = this.props.dataTrace.join(", ");
+        const dataTrace = this.props.dataTrace.stack.join(", ");
         const price = this.props.data.retail_price;
         return (
             <div className="col-md-3">

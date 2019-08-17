@@ -1,12 +1,13 @@
 package com.shoprunner.baleenproductdemo.types
 
-import com.shoprunner.baleen.Baleen
+import com.shoprunner.baleen.Baleen.describeAs
 import com.shoprunner.baleen.types.LongType
 import com.shoprunner.baleen.types.StringCoercibleToLong
 
-object Types {
+val productType = "Product".describeAs {
 
-    val productType = Baleen.describe("Product") {
-        
-    }
+    "retail_price".type(
+        type = StringCoercibleToLong(LongType(min = 0)),
+        required = true
+    )
 }
