@@ -40,8 +40,6 @@ class DataValidationSerializer : StdSerializer<DataWithValidation>(DataWithValid
             }
         }
         gen?.writeEndObject()
-
-
     }
 
 }
