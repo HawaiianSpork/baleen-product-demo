@@ -49,7 +49,7 @@ class App extends React.Component {
     }
 
     dataTraceYaml(validation) {
-      return validation.dataTrace.map((x) => "      - " + x).join("\n")
+      return validation.dataTrace.stack.map((x) => "      - " + x).join("\n")
     }
 
     onAutoGenConfig() {
