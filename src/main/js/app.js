@@ -134,15 +134,15 @@ class Configuration extends React.Component {
 }
 
 class ValidationMessages extends React.Component {
-    summarize(validations) {
-        return _.map(validations, (validation) => validation.dataTrace.stack[validation.dataTrace.stack.length - 1] + " " + validation.message)
+    summarize(validation) {
+        return validation.dataTrace.stack[validation.dataTrace.stack.length - 1] + " " + validation.message
     }
 
     render() {
         const messages = this.props.validations
             .filter((x) => x.type === 'Error')
             .map(validation => {
-                    return (<div className="alert alert-danger">{validation.message} (line {validation.dataTrace.tags.line})</div>)
+                    return (<div className="alert alert-danger">{this.summarize(validation)} (line {validation.dataTrace.tags.line})</div>)
                     // const dataTrace = validation.dataTrace.join(", ");
                     // return (<div className="alert alert-danger">{dataTrace} {validation.message}</div>)
                 }
