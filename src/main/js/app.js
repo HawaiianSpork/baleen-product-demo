@@ -135,7 +135,7 @@ class Configuration extends React.Component {
 
 class ValidationMessages extends React.Component {
     summarize(validation) {
-        return validation.dataTrace.stack[validation.dataTrace.stack.length - 1] + " " + validation.message
+        return validation.dataTrace.stack[validation.dataTrace.stack.length - 1] + " with value \"" + validation.value + "\" " + validation.message
     }
 
     render() {
